@@ -7,29 +7,82 @@ class Matrix:
         self.n = n
         self.m = m
 
-        values = map(lambda x : int(x), values)
+        values = map(lambda x : float(x), values)
         if len(values) == self.n*self.m:
-            self.values = values[0:self.m*self.n-1]
+            self.values = values[0:self.n*self.m]
+        else:
+            sys.exit("Error, values argument of incorrect dimension.")
+
+
+
+    def __str__(self):
+        retstr = ""
+
+        retstr += "\n\n"
+        retstr += "[\n"
+
+        for i in range(0, self.n):
+            for j in range(0, self.m):
+                retstr += '{:>6,.2f}'.format(self.values[self.m*i + j])
+                retstr += ' , '
+            retstr += "\n"
+
+        retstr += "]\n"
+
+        return retstr
+
+
+
+    def __add__(self, other):
+        if isinstance(other, Matrix):
+            if self.n != other.n or self.m != other.m:
+                sys.exit("Matrix dimensions do not match. Aborting!")
+
+            return Matrix(self.n, self.m, [self.values[k] + other.values[k] for k in range(0, self.n*self.m)])
+
+        else:
+            sys.exit("Cannot add matrix and object of type " + str(type(other)))
+
+
+
+    def __mul__(self, other):
+        if isinstance(other, (int, float, long)):
+            return Matrix(self.n, self.m, [other*x for x in self.values])
+
+        elif isinstance(other, Matrix):
+            if self.n != other.m or self.m != other.n:
+                sys.exit("Matrix dimensions do not match. Aborting!")
+
+            #values = []
+            values = [sum(map(lambda x : x[0]*x[1], zip(self.get_row(k/self.m), other.get_col(k%other.m)))) for k in range(0, self.n*self.n)]
+            #for i in range(0, self.n):
+            #    for j in range(0, self.m):
+            #        values[i*self.m + j] = sum(map(lambda x : x[0]*x[1], zip(self.get_row(i%self.n), other.get_col(j%self.m))))
+            return Matrix(self.n, self.n, values)
+
+        else:
+            sys.exit("Cannot multiply matrix and object of type " + str(type(other)))
 
 
 
     def print_matrix(self):
-        print "\n\n",
-        print "["
+        print self.__str__()
+        #print "\n\n",
+        #print "["
 
-        for i in range(0, self.n):
-            for j in range(0, self.m):
-                print '{:>6,.2f}'.format(self.values[self.m*i + j]),
-                print ',',
-            print "\n",
+        #for i in range(0, self.n):
+        #    for j in range(0, self.m):
+        #        print '{:>6,.2f}'.format(self.values[self.m*i + j]),
+        #        print ',',
+        #    print "\n",
 
-        print "]"
+        #print "]"
 
 
 
     def get_row(self, row):
         row = row % self.n
-        return self.values[row*m:row*(self.m+1)-1]
+        return self.values[row*self.m:(row+1)*self.m]
 
 
 
@@ -79,13 +132,9 @@ class Matrix:
 class NullMatrix(Matrix):
 
     def __init__(self, dim):
-        values = []
-        
-        for i in range(0, dim):
-            for j in range(0, dim):
-                values.append(0)
+        values = [0 for x in range(0, pow(dim, 2))]
 
-        print len(values)
+        print values
 
         Matrix.__init__(self, dim, dim, values)
 
@@ -95,7 +144,7 @@ class IdentityMatrix(Matrix):
 
     def __init__(self, dim):
         values = []
-        
+
         for i in range(0, dim):
             for j in range(0, dim):
                 if i == j:
@@ -111,25 +160,53 @@ class IdentityMatrix(Matrix):
 #mat = Matrix(2, 2, [1, 0, 0, 1])
 #mat.print_matrix()
 
-nullmat = NullMatrix(4)
-nullmat.print_matrix()
+#nullmat = NullMatrix(4)
+#print nullmat
 
-idmat = IdentityMatrix(5)
-idmat.print_matrix()
+#idmat = IdentityMatrix(5)
+#print idmat
 
-mat = Matrix(3, 3, [1, 2, 3, 2, 1, 3, 3, 2, 1])
-mat.print_matrix()
+#mat = Matrix(3, 3, [1, 2, 3, 2, 1, 3, 3, 2, 1])
+#print mat
 
-mat.row_mult(1, 2)
-mat.print_matrix()
+#mat.row_mult(1, 2)
+#print mat
 #mat.row_mult(1, 1.0/2)
 #mat.print_matrix()
 
-mat.row_swap(1, 2)
-mat.print_matrix()
+#mat.row_swap(1, 2)
+#print mat
 
-mat.row_comb(0, 2, 1, 1)
-mat.print_matrix()
+#mat.row_comb(0, 2, 1, 1)
+#print mat
 
-mat.eliminate()
-mat.print_matrix()
+#mat.eliminate()
+#print mat
+
+#mat = Matrix(3, 3, [1, 2, 3, 2, 1, 3, 3, 2, 1])
+#print mat
+#mat = mat * 3.7
+#print mat
+
+mat1 = Matrix(3, 2, [1, 2, 3, 2, 1, 3])
+#mat2 = Matrix(3, 2, [3, 2, 1, 3, 3, 2])
+#mat3 = mat1 + mat2
+#print mat1
+#print "\n+\n",
+#print mat2
+#print "\n=\n",
+#print mat3
+
+print mat1.get_row(0)
+print mat1.get_col(0)
+
+print mat1.get_row(1)
+print mat1.get_col(1)
+
+mat2 = Matrix(2, 3, [3, 2, 1, 3, 3, 2])
+mat3 = mat1 * mat2
+print mat1
+print "\n*\n",
+print mat2
+print "\n=\n",
+print mat3
