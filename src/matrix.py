@@ -14,17 +14,16 @@ class Matrix:
 
 
     def print_matrix(self):
-        print "\n\n[\n",
+        print "\n\n",
+        print "["
 
-    	for i in range(self.n):
-            print "\t",
+        for i in range(0, self.n):
+            for j in range(0, self.m):
+                print '{:>6,.2f}'.format(self.values[self.m*i + j]),
+                print ',',
+            print "\n",
 
-            for j in range(self.m):
-                print str(self.values[i*self.m + j]) + ",\t",
-
-	    print "\n",
-
-        print "]\n\n",
+        print "]"
 
 
 
