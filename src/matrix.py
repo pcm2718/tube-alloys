@@ -33,6 +33,11 @@ class Matrix:
 
 
 
+    def __getitem__(self, a):
+        return self.get_row(a)
+
+
+
     def __add__(self, other):
         if isinstance(other, Matrix):
             if self.n != other.n or self.m != other.m:
@@ -53,15 +58,30 @@ class Matrix:
             if self.n != other.m or self.m != other.n:
                 sys.exit("Matrix dimensions do not match. Aborting!")
 
-            #values = []
-            values = [sum(map(lambda x : x[0]*x[1], zip(self.get_row(k/self.m), other.get_col(k%other.m)))) for k in range(0, self.n*self.n)]
-            #for i in range(0, self.n):
-            #    for j in range(0, self.m):
-            #        values[i*self.m + j] = sum(map(lambda x : x[0]*x[1], zip(self.get_row(i%self.n), other.get_col(j%self.m))))
-            return Matrix(self.n, self.n, values)
+            return Matrix(self.n, self.n, [sum(map(lambda x : x[0]*x[1], zip(self.get_row(k/self.n), other.get_col(k)))) for k in range(0, self.n*self.n)])
 
         else:
             sys.exit("Cannot multiply matrix and object of type " + str(type(other)))
+   
+
+            
+    def __rmul__(self, other):
+        if isinstance(other, (int, float, long)):
+            return Matrix(self.n, self.m, [other*x for x in self.values])
+
+        elif isinstance(other, Matrix):
+            if self.n != other.m or self.m != other.n:
+                sys.exit("Matrix dimensions do not match. Aborting!")
+
+            return Matrix(self.m, self.m, [sum(map(lambda x : x[0]*x[1], zip(other.get_row(k/other.n), self.get_col(k)))) for k in range(0, self.m*self.m)])
+
+        else:
+            sys.exit("Cannot multiply matrix and object of type " + str(type(other)))
+
+
+
+    def transpose(self):
+        return Matrix(self.m, self.n, [self.values[(k%self.n)*self.m + (k/self.n)] for k in range(0, self.n*self.m)])
 
 
 
@@ -186,9 +206,10 @@ class IdentityMatrix(Matrix):
 #mat = Matrix(3, 3, [1, 2, 3, 2, 1, 3, 3, 2, 1])
 #print mat
 #mat = mat * 3.7
+#mat = 3.7 * mat
 #print mat
 
-mat1 = Matrix(3, 2, [1, 2, 3, 2, 1, 3])
+#mat1 = Matrix(3, 2, [1, 2, 3, 2, 1, 3])
 #mat2 = Matrix(3, 2, [3, 2, 1, 3, 3, 2])
 #mat3 = mat1 + mat2
 #print mat1
@@ -197,16 +218,25 @@ mat1 = Matrix(3, 2, [1, 2, 3, 2, 1, 3])
 #print "\n=\n",
 #print mat3
 
-print mat1.get_row(0)
-print mat1.get_col(0)
+#mat2 = Matrix(2, 3, [3, 2, 1, 3, 3, 2])
+#print mat2
+#print mat2[1][1]
+#print mat2.transpose()
 
-print mat1.get_row(1)
-print mat1.get_col(1)
+#print mat1.get_row(0)
+#print mat2.get_col(0)
+#print sum(map(lambda x : x[0]*x[1], zip( mat1.get_row(2), mat2.get_col(0) )))
 
-mat2 = Matrix(2, 3, [3, 2, 1, 3, 3, 2])
-mat3 = mat1 * mat2
-print mat1
-print "\n*\n",
-print mat2
-print "\n=\n",
-print mat3
+#mat3 = mat1 * mat2
+#print mat1
+#print "\n*\n",
+#print mat2
+#print "\n=\n",
+#print mat3
+
+#mat3 = mat2 * mat1
+#print mat2
+#print "\n*\n",
+#print mat1
+#print "\n=\n",
+#print mat3
