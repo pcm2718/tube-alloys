@@ -34,7 +34,14 @@ class Matrix:
 
 
     def __getitem__(self, a):
-        return self.get_row(a)
+        return self.values[a[0]*self.m + a[1]]
+
+
+
+    def __setitem__(self, a, b):
+        row = a[0] % self.n
+        col = a[1] % self.m
+        self.values[row*self.m + col] = b
 
 
 
@@ -44,6 +51,18 @@ class Matrix:
                 sys.exit("Matrix dimensions do not match. Aborting!")
 
             return Matrix(self.n, self.m, [self.values[k] + other.values[k] for k in range(0, self.n*self.m)])
+
+        else:
+            sys.exit("Cannot add matrix and object of type " + str(type(other)))
+
+
+
+    def __sub__(self, other):
+        if isinstance(other, Matrix):
+            if self.n != other.n or self.m != other.m:
+                sys.exit("Matrix dimensions do not match. Aborting!")
+
+            return Matrix(self.n, self.m, [self.values[k] - other.values[k] for k in range(0, self.n*self.m)])
 
         else:
             sys.exit("Cannot add matrix and object of type " + str(type(other)))
@@ -153,8 +172,6 @@ class NullMatrix(Matrix):
 
     def __init__(self, dim):
         values = [0 for x in range(0, pow(dim, 2))]
-
-        print values
 
         Matrix.__init__(self, dim, dim, values)
 
