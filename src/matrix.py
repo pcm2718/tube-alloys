@@ -2,6 +2,7 @@ import sys
 
 class Matrix:
 
+    # Constructor, assumes that the matrix is square if only one dimension argument is provided.
     def __init__(self, n, m=None, values=[]):
         if m == None:
             m = n
@@ -13,7 +14,7 @@ class Matrix:
         if len(values) == self.n*self.m:
             self.values = values[0:self.n*self.m]
         else:
-            sys.exit("Error, values argument of incorrect dimension.")
+            raise ValueError("Values array does not match matrix size.")
 
 
 
@@ -39,16 +40,19 @@ class Matrix:
         return self.__str__()
 
 
+    # Retrive a matrix entry with the syntax mat[i, j].
     def __getitem__(self, a):
         return self.values[a[0]*self.m + a[1]]
 
 
 
+    # Set a matrix entry with the syntax mat[i, j] = b.
     def __setitem__(self, a, b):
         self.values[(a[0] % self.n)*self.m + a[1] % self.m] = b
 
 
 
+    # Defines matrix addition, self is assumed to be the matrix on the left, but this is irrelevant as addition is commutative. 
     def __add__(self, other):
         if isinstance(other, Matrix):
             if self.n != other.n or self.m != other.m:
@@ -61,6 +65,7 @@ class Matrix:
 
 
 
+    # Defines matrix subtraction, self is assumed to be the matrix on the left.
     def __sub__(self, other):
         if isinstance(other, Matrix):
             if self.n != other.n or self.m != other.m:
@@ -73,6 +78,8 @@ class Matrix:
 
 
 
+    # This function defines matrix multiplication by both scalars and other matricies. It assumes the instance of matrix calling it is on the left side of the
+    # the matrix multiplication.
     def __mul__(self, other):
         if isinstance(other, (int, float, long)):
             return Matrix(self.n, self.m, [other*x for x in self.values])
@@ -88,6 +95,8 @@ class Matrix:
    
 
             
+    # This function defines multiplication by a matrix in a manner identical to the one above, except that this function assumes that the instance of Matrix
+    # calling it is on the right side of the multiplication. In theory it should only be called to handle the case where a vector is left multiplied by a scalar.
     def __rmul__(self, other):
         if isinstance(other, (int, float, long)):
             return Matrix(self.n, self.m, [other*x for x in self.values])
@@ -103,26 +112,27 @@ class Matrix:
 
 
 
+    # Return the transposed matrix.
     def transpose(self):
         return Matrix(self.m, self.n, [self.values[(k%self.n)*self.m + (k/self.n)] for k in range(0, self.n*self.m)])
 
 
 
+    # Get a row, indexed from 0, wraping around either side of the matrix.
     def get_row(self, row):
         row = row % self.n
         return self.values[row*self.m:(row+1)*self.m]
 
 
 
+    # Get a column, indexed from 0, wraping around the top and bottom of the matrix.
     def get_col(self, col):
         col = col % self.m
-        values = []
-        for i in range(0, self.n):
-            values.append(self.values[i*self.m + col])
-        return values
+        return [self.values[i*self.m + col] for i in range(0, self.n)]
 
 
 
+# This class is a subclass of Matrix, always creating a null matrix on initializaiton.
 class NullMatrix(Matrix):
 
     def __init__(self, n, m=None):
@@ -132,6 +142,7 @@ class NullMatrix(Matrix):
 
 
 
+# This class is a subclass designed to improve the ease of use of identity matricies.
 class IdentityMatrix(Matrix):
 
     def __init__(self, dim):

@@ -48,13 +48,16 @@ class Cholesky:
         # Set up the vectors b_i and b_i^t to compute the outer product op_mat.
         op_mat = Matrix(len(b_vec), 1, b_vec) * Matrix(1, len(b_vec), b_vec)
 
+        # Set the matrix B in a new matrix instance.
         b_mat = NullMatrix(a_mat.n)
         for p in range(i+1, a_mat.n):
             for q in range(i+1, a_mat.m):
                 b_mat[p, q] = a_mat[p, q]
 
+        # Compute the new sub-matrix b.
         c_mat = b_mat - (1/a_sca)*op_mat
 
+        # Compute A_i+1 from c_mat by setting upper diagonal entries to one.
         for k in range(0, i):
             c_mat[k, k] = 1
 
